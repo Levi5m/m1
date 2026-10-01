@@ -269,6 +269,38 @@
     white-space:nowrap;
 }
 
+
+/* ACTUAL LIVE LIST POSITION OVERRIDE */
+#list-stack {
+    position: fixed !important;
+    top: 5vh !important;
+    right: 5vh !important;
+    left: auto !important;
+    bottom: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: flex-end !important;
+    gap: 1vh !important;
+    z-index: 1500 !important;
+    pointer-events: none !important;
+}
+#list-stack #live-list-Keybinds {
+    position: fixed !important;
+    top: 5vh !important;
+    left: 5vh !important;
+    right: auto !important;
+    bottom: auto !important;
+}
+#list-stack #live-list-Spectators,
+#list-stack #live-list-Administrators {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+}
+
 </style>
 <style>
 /* cleaner bottom-right counter */
@@ -1541,9 +1573,53 @@ function render(c){var d=c.__cf;c.classList.add('clara-frame');
   (d.items.length?d.items.map(function(i){
    if(c.id==='live-list-Keybinds'){return'<div class="cf-row"><span>'+esc(i.label)+'</span><span class="cf-v">'+(i.valueHtml!==undefined?i.valueHtml:esc(i.value))+'</span></div>'}
    return'<span>'+esc(i.label)+' ('+esc(i.value)+')</span>'}).join(''):'<span>None</span>')+'</div>'}
-function stack(c){var st=document.getElementById('list-stack');if(!st){st=document.createElement('div');st.id='list-stack';document.body.appendChild(st)}
+function stack(c){
+ var st=document.getElementById('list-stack');
+ if(!st){
+  st=document.createElement('div');
+  st.id='list-stack';
+  document.body.appendChild(st);
+ }
  st.appendChild(c);
- ['live-list-Spectators','live-list-Administrators','live-list-Keybinds'].map(function(id){return document.getElementById(id)}).filter(Boolean).forEach(function(e){st.appendChild(e)})}
+
+ ['live-list-Spectators','live-list-Administrators','live-list-Keybinds']
+  .map(function(id){return document.getElementById(id)})
+  .filter(Boolean)
+  .forEach(function(e){st.appendChild(e)});
+
+ /* Enforce the in-game layout directly on the elements.
+    This overrides the position values supplied by createLiveList(). */
+ st.style.setProperty('position','fixed','important');
+ st.style.setProperty('top','5vh','important');
+ st.style.setProperty('right','5vh','important');
+ st.style.setProperty('display','flex','important');
+ st.style.setProperty('flex-direction','row','important');
+ st.style.setProperty('align-items','flex-start','important');
+ st.style.setProperty('justify-content','flex-end','important');
+ st.style.setProperty('gap','1vh','important');
+ st.style.setProperty('z-index','1500','important');
+ st.style.setProperty('pointer-events','none','important');
+
+ var kb=document.getElementById('live-list-Keybinds');
+ if(kb){
+  kb.style.setProperty('position','fixed','important');
+  kb.style.setProperty('top','5vh','important');
+  kb.style.setProperty('left','5vh','important');
+  kb.style.setProperty('right','auto','important');
+  kb.style.setProperty('bottom','auto','important');
+ }
+
+ ['live-list-Spectators','live-list-Administrators'].forEach(function(id){
+  var e=document.getElementById(id);
+  if(e){
+   e.style.setProperty('position','relative','important');
+   e.style.setProperty('top','auto','important');
+   e.style.setProperty('right','auto','important');
+   e.style.setProperty('bottom','auto','important');
+   e.style.setProperty('left','auto','important');
+  }
+ });
+}
 var _c=window.createLiveList,_u=window.updateLiveList;
 window.createLiveList=function(data){_c(data);if(data&&CF.indexOf(data.id)>-1){var c=document.getElementById('live-list-'+data.id);if(c){c.__cf={header:data.header||'List',icon:data.icon,items:data.items||[]};render(c);stack(c)}}};
 window.updateLiveList=function(data){_u(data);if(data&&CF.indexOf(data.id)>-1){var c=document.getElementById('live-list-'+data.id);if(c&&c.__cf){if(data.header)c.__cf.header=data.header;if(data.icon!==undefined)c.__cf.icon=data.icon;if(data.items!==undefined)c.__cf.items=data.items;render(c)}}};
